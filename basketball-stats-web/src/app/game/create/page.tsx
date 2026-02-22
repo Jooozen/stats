@@ -1,24 +1,52 @@
 "use client";
 
-import { Trophy, Plus } from "lucide-react";
+import { useState } from "react";
+import { Trophy, Plus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useGames } from "@/db/hooks";
 import { formatDate, formatScore } from "@/utils/helpers";
 import { GAME_TYPES } from "@/constants/actions";
+import { CreateWizard } from "@/components/game/CreateWizard";
+import { useGameCreateStore } from "@/stores/gameCreateStore";
 
 export default function GameCreatePage() {
   const games = useGames();
+  const [showWizard, setShowWizard] = useState(false);
+  const resetWizard = useGameCreateStore((s) => s.reset);
 
   const gameTypeLabel = (type: string) =>
     GAME_TYPES.find((t) => t.value === type)?.label ?? type;
+
+  const handleNewGame = () => {
+    resetWizard();
+    setShowWizard(true);
+  };
+
+  if (showWizard) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowWizard(false)}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-2xl font-bold">新しい試合</h1>
+        </div>
+        <CreateWizard />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">試合</h1>
-        <Button size="default">
+        <Button size="default" onClick={handleNewGame}>
           <Plus className="h-5 w-5 mr-1" />
           新しい試合
         </Button>
