@@ -3,136 +3,154 @@ import type { ActionType } from "@/types/database";
 export interface ActionDefinition {
   type: ActionType;
   label: string;
-  shortLabel: string;
-  category: "shot" | "rebound" | "other";
-  isPositive: boolean; // 成功/ポジティブなアクションか
-  points?: number; // 得点になる場合の点数
+  category: "score" | "rebound" | "other" | "substitution";
+  points: number;
+  color: "success" | "miss" | "neutral" | "warning";
 }
 
 export const ACTION_DEFINITIONS: Record<ActionType, ActionDefinition> = {
-  // シュート系
-  FGM: {
-    type: "FGM",
-    label: "2Pシュート成功",
-    shortLabel: "2P○",
-    category: "shot",
-    isPositive: true,
+  // 得点系
+  FG2_MADE: {
+    type: "FG2_MADE",
+    label: "2P○",
+    category: "score",
     points: 2,
+    color: "success",
   },
-  FGA: {
-    type: "FGA",
-    label: "2Pシュートミス",
-    shortLabel: "2P×",
-    category: "shot",
-    isPositive: false,
+  FG2_MISS: {
+    type: "FG2_MISS",
+    label: "2P×",
+    category: "score",
+    points: 0,
+    color: "miss",
   },
-  "3PM": {
-    type: "3PM",
-    label: "3Pシュート成功",
-    shortLabel: "3P○",
-    category: "shot",
-    isPositive: true,
+  FG3_MADE: {
+    type: "FG3_MADE",
+    label: "3P○",
+    category: "score",
     points: 3,
+    color: "success",
   },
-  "3PA": {
-    type: "3PA",
-    label: "3Pシュートミス",
-    shortLabel: "3P×",
-    category: "shot",
-    isPositive: false,
+  FG3_MISS: {
+    type: "FG3_MISS",
+    label: "3P×",
+    category: "score",
+    points: 0,
+    color: "miss",
   },
-  FTM: {
-    type: "FTM",
-    label: "フリースロー成功",
-    shortLabel: "FT○",
-    category: "shot",
-    isPositive: true,
+  FT_MADE: {
+    type: "FT_MADE",
+    label: "FT○",
+    category: "score",
     points: 1,
+    color: "success",
   },
-  FTA: {
-    type: "FTA",
-    label: "フリースローミス",
-    shortLabel: "FT×",
-    category: "shot",
-    isPositive: false,
+  FT_MISS: {
+    type: "FT_MISS",
+    label: "FT×",
+    category: "score",
+    points: 0,
+    color: "miss",
   },
   // リバウンド
-  OREB: {
-    type: "OREB",
-    label: "オフェンスリバウンド",
-    shortLabel: "OR",
+  REBOUND_OFF: {
+    type: "REBOUND_OFF",
+    label: "ORB",
     category: "rebound",
-    isPositive: true,
+    points: 0,
+    color: "neutral",
   },
-  DREB: {
-    type: "DREB",
-    label: "ディフェンスリバウンド",
-    shortLabel: "DR",
+  REBOUND_DEF: {
+    type: "REBOUND_DEF",
+    label: "DRB",
     category: "rebound",
-    isPositive: true,
+    points: 0,
+    color: "neutral",
   },
   // その他
-  AST: {
-    type: "AST",
-    label: "アシスト",
-    shortLabel: "AST",
+  ASSIST: {
+    type: "ASSIST",
+    label: "AST",
     category: "other",
-    isPositive: true,
+    points: 0,
+    color: "neutral",
   },
-  STL: {
-    type: "STL",
-    label: "スティール",
-    shortLabel: "STL",
+  STEAL: {
+    type: "STEAL",
+    label: "STL",
     category: "other",
-    isPositive: true,
+    points: 0,
+    color: "success",
   },
-  BLK: {
-    type: "BLK",
-    label: "ブロック",
-    shortLabel: "BLK",
+  BLOCK: {
+    type: "BLOCK",
+    label: "BLK",
     category: "other",
-    isPositive: true,
+    points: 0,
+    color: "success",
   },
-  TO: {
-    type: "TO",
-    label: "ターンオーバー",
-    shortLabel: "TO",
+  TURNOVER: {
+    type: "TURNOVER",
+    label: "TO",
     category: "other",
-    isPositive: false,
+    points: 0,
+    color: "warning",
   },
-  PF: {
-    type: "PF",
-    label: "パーソナルファウル",
-    shortLabel: "PF",
+  FOUL: {
+    type: "FOUL",
+    label: "PF",
     category: "other",
-    isPositive: false,
+    points: 0,
+    color: "warning",
   },
-  TF: {
-    type: "TF",
-    label: "テクニカルファウル",
-    shortLabel: "TF",
+  FOUL_TECHNICAL: {
+    type: "FOUL_TECHNICAL",
+    label: "TF",
     category: "other",
-    isPositive: false,
+    points: 0,
+    color: "miss",
+  },
+  // 交代
+  SUBSTITUTION_IN: {
+    type: "SUBSTITUTION_IN",
+    label: "IN",
+    category: "substitution",
+    points: 0,
+    color: "neutral",
+  },
+  SUBSTITUTION_OUT: {
+    type: "SUBSTITUTION_OUT",
+    label: "OUT",
+    category: "substitution",
+    points: 0,
+    color: "neutral",
   },
 };
 
 /** カテゴリ別のアクションリスト */
-export const SHOT_ACTIONS: ActionType[] = [
-  "FGM",
-  "FGA",
-  "3PM",
-  "3PA",
-  "FTM",
-  "FTA",
+export const SCORE_ACTIONS: ActionType[] = [
+  "FG2_MADE",
+  "FG2_MISS",
+  "FG3_MADE",
+  "FG3_MISS",
+  "FT_MADE",
+  "FT_MISS",
 ];
-export const REBOUND_ACTIONS: ActionType[] = ["OREB", "DREB"];
+
+export const REBOUND_ACTIONS: ActionType[] = ["REBOUND_OFF", "REBOUND_DEF"];
+
 export const OTHER_ACTIONS: ActionType[] = [
-  "AST",
-  "STL",
-  "BLK",
-  "TO",
-  "PF",
-  "TF",
+  "ASSIST",
+  "STEAL",
+  "BLOCK",
+  "TURNOVER",
+  "FOUL",
+  "FOUL_TECHNICAL",
+];
+
+export const SUBSTITUTION_ACTIONS: ActionType[] = [
+  "SUBSTITUTION_IN",
+  "SUBSTITUTION_OUT",
 ];
 
 /** ポジション定義 */
@@ -142,4 +160,11 @@ export const POSITIONS = [
   { value: "SF", label: "スモールフォワード" },
   { value: "PF", label: "パワーフォワード" },
   { value: "C", label: "センター" },
+] as const;
+
+/** 試合タイプ定義 */
+export const GAME_TYPES = [
+  { value: "official", label: "公式戦" },
+  { value: "practice", label: "練習試合" },
+  { value: "scrimmage", label: "紅白戦" },
 ] as const;

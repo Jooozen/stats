@@ -3,16 +3,17 @@
 import { useParams } from "next/navigation";
 import { Users, Plus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useTeam, usePlayersByTeam } from "@/db/hooks";
+import { useTeam, usePlayers } from "@/db/hooks";
+import { getPlayerDisplayName } from "@/utils/helpers";
 import { POSITIONS } from "@/constants/actions";
 
 export default function PlayersPage() {
   const params = useParams();
   const teamId = params.id as string;
   const team = useTeam(teamId);
-  const players = usePlayersByTeam(teamId);
+  const players = usePlayers(teamId);
 
   const positionLabel = (pos: string) =>
     POSITIONS.find((p) => p.value === pos)?.label ?? pos;
@@ -60,7 +61,9 @@ export default function PlayersPage() {
                     {player.number}
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-lg">{player.name}</p>
+                    <p className="font-semibold text-lg">
+                      {getPlayerDisplayName(player)}
+                    </p>
                     <p className="text-sm text-basketball-muted">
                       {player.position
                         ? positionLabel(player.position)

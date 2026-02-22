@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Users, Plus, ChevronRight } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTeams } from "@/db/hooks";
 
@@ -39,15 +39,18 @@ export default function TeamListPage() {
                 <CardContent className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                      style={{ backgroundColor: team.color }}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
+                        team.isOwnTeam
+                          ? "bg-basketball-home"
+                          : "bg-basketball-away"
+                      }`}
                     >
-                      {team.shortName.slice(0, 2)}
+                      {team.name.slice(0, 2)}
                     </div>
                     <div>
                       <p className="font-semibold text-lg">{team.name}</p>
                       <p className="text-sm text-basketball-muted">
-                        {team.isMyTeam ? "自チーム" : "対戦相手"}
+                        {team.isOwnTeam ? "自チーム" : "対戦相手"}
                       </p>
                     </div>
                   </div>

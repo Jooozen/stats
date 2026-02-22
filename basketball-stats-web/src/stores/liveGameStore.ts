@@ -1,10 +1,9 @@
 import { create } from "zustand";
-import type { ActionType } from "@/types/database";
 
 interface LiveGameState {
   gameId: string | null;
   currentQuarter: number;
-  gameTime: number; // 経過秒数
+  gameClock: string; // "MM:SS"
   isRunning: boolean;
   selectedTeamId: string | null;
   selectedPlayerId: string | null;
@@ -12,7 +11,7 @@ interface LiveGameState {
   // Actions
   setGameId: (id: string | null) => void;
   setCurrentQuarter: (quarter: number) => void;
-  setGameTime: (time: number) => void;
+  setGameClock: (clock: string) => void;
   setIsRunning: (running: boolean) => void;
   setSelectedTeamId: (id: string | null) => void;
   setSelectedPlayerId: (id: string | null) => void;
@@ -22,7 +21,7 @@ interface LiveGameState {
 const initialState = {
   gameId: null,
   currentQuarter: 1,
-  gameTime: 0,
+  gameClock: "10:00",
   isRunning: false,
   selectedTeamId: null,
   selectedPlayerId: null,
@@ -32,7 +31,7 @@ export const useLiveGameStore = create<LiveGameState>((set) => ({
   ...initialState,
   setGameId: (id) => set({ gameId: id }),
   setCurrentQuarter: (quarter) => set({ currentQuarter: quarter }),
-  setGameTime: (time) => set({ gameTime: time }),
+  setGameClock: (clock) => set({ gameClock: clock }),
   setIsRunning: (running) => set({ isRunning: running }),
   setSelectedTeamId: (id) => set({ selectedTeamId: id }),
   setSelectedPlayerId: (id) => set({ selectedPlayerId: id }),

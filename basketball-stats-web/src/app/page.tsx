@@ -83,7 +83,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-between p-3 rounded-lg bg-basketball-bg hover:bg-basketball-border transition-colors">
                     <div>
                       <p className="text-sm text-basketball-muted">
-                        {formatDate(game.date)}
+                        {formatDate(game.gameDate)}
                       </p>
                       <p className="text-lg font-bold">
                         {formatScore(game.homeScore, game.awayScore)}

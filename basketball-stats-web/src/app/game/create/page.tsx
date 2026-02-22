@@ -6,9 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useGames } from "@/db/hooks";
 import { formatDate, formatScore } from "@/utils/helpers";
+import { GAME_TYPES } from "@/constants/actions";
 
 export default function GameCreatePage() {
   const games = useGames();
+
+  const gameTypeLabel = (type: string) =>
+    GAME_TYPES.find((t) => t.value === type)?.label ?? type;
 
   return (
     <div className="space-y-6">
@@ -52,12 +56,13 @@ export default function GameCreatePage() {
                   <div className="flex items-center justify-between p-4 rounded-lg bg-basketball-bg hover:bg-basketball-border transition-colors">
                     <div>
                       <p className="text-sm text-basketball-muted">
-                        {formatDate(game.date)}
-                        {game.venue && ` / ${game.venue}`}
+                        {formatDate(game.gameDate)}
+                        {" / "}
+                        {gameTypeLabel(game.gameType)}
                       </p>
-                      {game.tournament && (
+                      {game.tournamentName && (
                         <p className="text-sm text-basketball-muted">
-                          {game.tournament}
+                          {game.tournamentName}
                         </p>
                       )}
                       <p className="text-xl font-bold mt-1">
@@ -65,7 +70,7 @@ export default function GameCreatePage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {game.status === "scheduled" && (
+                      {game.status === "upcoming" && (
                         <span className="px-2 py-1 rounded bg-basketball-border text-basketball-muted text-sm font-medium">
                           予定
                         </span>

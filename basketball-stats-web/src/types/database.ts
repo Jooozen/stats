@@ -1,121 +1,115 @@
-/** チーム */
+// ---------- チーム ----------
 export interface Team {
-  id: string;
-  name: string;
-  shortName: string; // 省略名（例: "北中"）
-  color: string; // チームカラー（HEX）
-  isMyTeam: boolean; // 自チームかどうか
-  createdAt: Date;
-  updatedAt: Date;
+  id: string;           // UUID
+  name: string;         // チーム名
+  isOwnTeam: boolean;   // true = 自チーム
+  createdAt: string;    // ISO 8601
+  updatedAt: string;
 }
 
-/** 選手 */
+// ---------- 選手 ----------
 export interface Player {
-  id: string;
-  teamId: string;
-  name: string;
-  number: number; // 背番号
-  position: PlayerPosition;
-  isActive: boolean; // 現役かどうか
-  createdAt: Date;
-  updatedAt: Date;
+  id: string;           // UUID
+  teamId: string;       // 所属チームID
+  name: string;         // 名前（空文字OK = 相手チームで名前不明の場合）
+  number: number;       // 背番号（必須）
+  position: Position | null;  // ポジション（任意）
+  isActive: boolean;    // true = 現役（false = 卒業生など）
+  createdAt: string;
+  updatedAt: string;
 }
 
-/** ポジション */
-export type PlayerPosition = "PG" | "SG" | "SF" | "PF" | "C" | "";
+export type Position = "PG" | "SG" | "SF" | "PF" | "C";
 
-/** 試合 */
+// ---------- 試合 ----------
 export interface Game {
   id: string;
   homeTeamId: string;
   awayTeamId: string;
-  date: Date;
-  venue: string;
-  tournament: string; // 大会名
-  quarterMinutes: number; // 1クォーターの時間（分）
-  numberOfQuarters: number; // クォーター数（通常4）
+  gameDate: string;           // ISO 8601
+  gameType: GameType;
+  tournamentName: string;     // 大会名（空文字OK）
+  quarterMinutes: number;     // 1Qの分数（デフォルト10）
+  totalQuarters: number;      // Q数（デフォルト4）
   status: GameStatus;
   homeScore: number;
   awayScore: number;
-  createdAt: Date;
-  updatedAt: Date;
+  opponentTrackingLevel: OpponentTrackingLevel;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-/** 試合状態 */
-export type GameStatus = "scheduled" | "live" | "finished";
+export type GameType = "official" | "practice" | "scrimmage";
+// official=公式戦, practice=練習試合, scrimmage=紅白戦
 
-/** 試合イベント（スタッツの最小単位） */
+export type GameStatus = "upcoming" | "live" | "finished";
+
+export type OpponentTrackingLevel = "full" | "score_only";
+// full=相手選手のスタッツを個別記録, score_only=スコアの加減のみ
+
+// ---------- 試合イベント ----------
 export interface GameEvent {
   id: string;
   gameId: string;
-  teamId: string;
-  playerId: string;
+  teamId: string;             // どちらのチームのイベントか
+  playerId: string | null;    // null = チームイベント（チームTO等）
   actionType: ActionType;
-  quarter: number; // 1-4 (延長は5以降)
-  gameTime: number; // 経過秒数
-  points?: number; // 得点数（シュート系アクションの場合）
-  x?: number; // シュート位置X（将来のシュートチャート用）
-  y?: number; // シュート位置Y
-  createdAt: Date;
+  quarter: number;
+  gameClock: string;          // "MM:SS"
+  shotX: number | null;       // シュート位置（0.0〜1.0）将来用
+  shotY: number | null;
+  isAndOne: boolean;          // バスケットカウント
+  relatedEventId: string | null;  // アシストと得点の紐づけ等
+  createdAt: string;
+  updatedAt: string;
 }
 
-/** アクション種別 */
 export type ActionType =
-  // シュート
-  | "FGM" // フィールドゴール成功（2P）
-  | "FGA" // フィールドゴール試投（2Pミス）
-  | "3PM" // 3ポイント成功
-  | "3PA" // 3ポイント試投（ミス）
-  | "FTM" // フリースロー成功
-  | "FTA" // フリースロー試投（ミス）
+  // 得点系
+  | "FG2_MADE" | "FG2_MISS"
+  | "FG3_MADE" | "FG3_MISS"
+  | "FT_MADE" | "FT_MISS"
   // リバウンド
-  | "OREB" // オフェンスリバウンド
-  | "DREB" // ディフェンスリバウンド
+  | "REBOUND_OFF" | "REBOUND_DEF"
   // その他
-  | "AST" // アシスト
-  | "STL" // スティール
-  | "BLK" // ブロック
-  | "TO" // ターンオーバー
-  | "PF" // パーソナルファウル
-  | "TF"; // テクニカルファウル
+  | "ASSIST" | "STEAL" | "BLOCK"
+  | "TURNOVER" | "FOUL" | "FOUL_TECHNICAL"
+  // 交代（記録用）
+  | "SUBSTITUTION_IN" | "SUBSTITUTION_OUT";
 
-/** ラインナップ（出場メンバー） */
+// ---------- 出場ラインナップ ----------
 export interface GameLineup {
   id: string;
   gameId: string;
-  teamId: string;
+  teamId: string;             // どちらのチームか
   playerId: string;
   quarter: number;
-  isStarter: boolean; // スターターかどうか
-  subInTime?: number; // 交代で入った時間（秒）
-  subOutTime?: number; // 交代で出た時間（秒）
+  checkInTime: string;        // 出場開始のゲームクロック
+  checkOutTime: string | null; // 交代時のゲームクロック（null=まだ出場中）
+  isStarter: boolean;
 }
 
-/** 選手ごとの試合スタッツ（集計済み） */
+// ---------- 選手別試合スタッツ（集計キャッシュ） ----------
 export interface PlayerGameStats {
   id: string;
   gameId: string;
-  teamId: string;
+  teamId: string;             // どちらのチームか
   playerId: string;
-  // シュート
-  fgm: number; // フィールドゴール成功
-  fga: number; // フィールドゴール試投
-  threepm: number; // 3P成功
-  threepa: number; // 3P試投
-  ftm: number; // FT成功
-  fta: number; // FT試投
-  // リバウンド
-  oreb: number;
-  dreb: number;
-  // その他
-  ast: number;
-  stl: number;
-  blk: number;
-  to: number;
-  pf: number;
-  tf: number;
-  // 計算値
-  points: number; // 合計得点
-  reb: number; // 合計リバウンド
-  minutes: number; // 出場時間（分）
+  minutes: number;            // 出場時間（分）
+  fg2Made: number;
+  fg2Attempted: number;
+  fg3Made: number;
+  fg3Attempted: number;
+  ftMade: number;
+  ftAttempted: number;
+  offRebounds: number;
+  defRebounds: number;
+  assists: number;
+  steals: number;
+  blocks: number;
+  turnovers: number;
+  fouls: number;
+  plusMinus: number;
+  points: number;             // 自動計算: fg2*2 + fg3*3 + ft
 }

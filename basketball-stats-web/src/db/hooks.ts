@@ -2,22 +2,37 @@
 
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "./database";
-import type { Team, Player, Game } from "@/types/database";
+import type {
+  Team,
+  Player,
+  Game,
+  GameEvent,
+  PlayerGameStats,
+} from "@/types/database";
 
 /** 全チーム一覧を取得 */
-export function useTeams() {
+export function useTeams(): Team[] {
   return useLiveQuery(() => db.teams.orderBy("createdAt").toArray()) ?? [];
 }
 
 /** 自チームを取得 */
-export function useMyTeams() {
+export function useOwnTeam(): Team | undefined {
+  return useLiveQuery(() =>
+    db.teams.where("isOwnTeam").equals(1).first()
+  );
+}
+
+/** 対戦相手チーム一覧を取得 */
+export function useOpponentTeams(): Team[] {
   return (
-    useLiveQuery(() => db.teams.where("isMyTeam").equals(1).toArray()) ?? []
+    useLiveQuery(() =>
+      db.teams.where("isOwnTeam").equals(0).toArray()
+    ) ?? []
   );
 }
 
 /** チームIDで1件取得 */
-export function useTeam(id: string | undefined) {
+export function useTeam(id: string | undefined): Team | undefined {
   return useLiveQuery(
     () => (id ? db.teams.get(id) : undefined),
     [id]
@@ -25,7 +40,7 @@ export function useTeam(id: string | undefined) {
 }
 
 /** チームの選手一覧を取得 */
-export function usePlayersByTeam(teamId: string | undefined) {
+export function usePlayers(teamId: string | undefined): Player[] {
   return (
     useLiveQuery(
       () =>
@@ -38,22 +53,24 @@ export function usePlayersByTeam(teamId: string | undefined) {
 }
 
 /** 全試合一覧を取得（新しい順） */
-export function useGames() {
+export function useGames(): Game[] {
   return (
-    useLiveQuery(() => db.games.orderBy("date").reverse().toArray()) ?? []
+    useLiveQuery(() =>
+      db.games.orderBy("gameDate").reverse().toArray()
+    ) ?? []
   );
 }
 
 /** 試合IDで1件取得 */
-export function useGame(id: string | undefined) {
+export function useGame(gameId: string | undefined): Game | undefined {
   return useLiveQuery(
-    () => (id ? db.games.get(id) : undefined),
-    [id]
+    () => (gameId ? db.games.get(gameId) : undefined),
+    [gameId]
   );
 }
 
 /** 試合のイベント一覧を取得 */
-export function useGameEvents(gameId: string | undefined) {
+export function useGameEvents(gameId: string | undefined): GameEvent[] {
   return (
     useLiveQuery(
       () =>
@@ -69,7 +86,9 @@ export function useGameEvents(gameId: string | undefined) {
 }
 
 /** 試合の選手スタッツを取得 */
-export function usePlayerGameStats(gameId: string | undefined) {
+export function usePlayerGameStats(
+  gameId: string | undefined
+): PlayerGameStats[] {
   return (
     useLiveQuery(
       () =>
