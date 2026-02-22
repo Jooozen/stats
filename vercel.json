@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd basketball-stats-web && npm install && npm run build",
+  "outputDirectory": "basketball-stats-web/.next",
+  "framework": "nextjs",
+  "installCommand": "cd basketball-stats-web && npm install"
+}
