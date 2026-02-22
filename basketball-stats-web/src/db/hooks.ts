@@ -85,6 +85,32 @@ export function useGameEvents(gameId: string | undefined): GameEvent[] {
   );
 }
 
+/** チームIDに紐づく選手数を取得 */
+export function usePlayerCount(teamId: string | undefined): number {
+  return (
+    useLiveQuery(
+      () =>
+        teamId
+          ? db.players.where("teamId").equals(teamId).count()
+          : 0,
+      [teamId]
+    ) ?? 0
+  );
+}
+
+/** チームごとの選手数マップを取得 */
+export function usePlayerCounts(teamIds: string[]): Record<string, number> {
+  return (
+    useLiveQuery(async () => {
+      const counts: Record<string, number> = {};
+      for (const id of teamIds) {
+        counts[id] = await db.players.where("teamId").equals(id).count();
+      }
+      return counts;
+    }, [teamIds.join(",")]) ?? {}
+  );
+}
+
 /** 試合の選手スタッツを取得 */
 export function usePlayerGameStats(
   gameId: string | undefined
